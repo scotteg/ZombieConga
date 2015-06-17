@@ -138,6 +138,7 @@ class GameScene: SKScene {
     velocity = direction * zombieMovePointsPerSec
   }
   
+  #if os(iOS)
   override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
     processTouches(touches)
   }
@@ -148,13 +149,28 @@ class GameScene: SKScene {
   
   func processTouches(touches: Set<NSObject>) {
     let touch = touches.first as! UITouch
-    let location = touch.locationInNode(backgroundLayer)
-    sceneTouched(location)
-    lastTouchLocation = location
+    let touchLocation = touch.locationInNode(backgroundLayer)
+    sceneTouched(touchLocation)
+  }
+  #else
+  override func mouseDown(theEvent: NSEvent) {
+    processEvent(theEvent)
   }
   
-  func sceneTouched(location: CGPoint) {
-    moveZombieToward(location)
+  override func mouseDragged(theEvent: NSEvent) {
+    processEvent(theEvent)
+  }
+  
+  func processEvent(theEvent: NSEvent) {
+    let touch = theEvent.locationInNode(backgroundLayer)
+    sceneTouched(touch)
+  }
+  #endif
+  
+  
+  func sceneTouched(touchLocation: CGPoint) {
+    moveZombieToward(touchLocation)
+    lastTouchLocation = touchLocation
   }
   
   func boundsCheckZombie() {

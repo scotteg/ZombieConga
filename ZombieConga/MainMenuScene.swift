@@ -16,9 +16,15 @@ class MainMenuScene: SKScene {
     addChild(background)
   }
   
+  #if os(iOS)
   override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
     sceneTapped()
   }
+  #else
+  override func mouseDown(theEvent: NSEvent) {
+    sceneTapped()
+  }
+  #endif
   
   func sceneTapped() {
     let gameScene = GameScene(size: size)
