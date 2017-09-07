@@ -2,28 +2,42 @@
 //  GameViewController.swift
 //  ZombieConga
 //
-//  Created by Scott Gardner on 6/15/15.
-//  Copyright (c) 2015 Scott Gardner. All rights reserved.
+//  Created by Scott Gardner on 9/2/17.
+//  Copyright © 2017 Scott Gardner. All rights reserved.
 //
 
 import UIKit
 import SpriteKit
 
-class GameViewController: UIViewController {
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    let scene = MainMenuScene(size: CGSize(width: 2048, height: 1536))
-    let skView = view as! SKView
-    skView.showsFPS = true
-    skView.showsNodeCount = true
-    skView.ignoresSiblingOrder = true
-    scene.scaleMode = .AspectFill
-    skView.presentScene(scene)
-  }
-  
-  override func prefersStatusBarHidden() -> Bool {
-    return true
-  }
-  
+final class GameViewController: UIViewController {
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        guard let skView = view as? SKView else { return }
+        skView.ignoresSiblingOrder = true
+        
+        #if DEBUG
+            if ProcessInfo.processInfo.environment["DISPLAY_STATS"] != nil {
+                displayStats(in: skView)
+            }
+        #endif
+        
+        let scene = MainMenuScene(size: CGSize(width: 2048, height: 1536))
+        scene.scaleMode = .aspectFill
+        skView.presentScene(scene)
+    }
+    
+    func displayStats(in skView: SKView) {
+        skView.showsNodeCount = true
+        skView.showsDrawCount = true
+        skView.showsQuadCount = true
+        skView.showsFPS = true
+        skView.showsPhysics = true
+        skView.showsFields = true
+    }
 }

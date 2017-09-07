@@ -2,53 +2,53 @@
 //  GameOverScene.swift
 //  ZombieConga
 //
-//  Created by Scott Gardner on 6/16/15.
-//  Copyright (c) 2015 Scott Gardner. All rights reserved.
+//  Created by Scott Gardner on 9/6/17.
+//  Copyright © 2017 Scott Gardner. All rights reserved.
 //
 
+import Foundation
 import SpriteKit
 
-class GameOverScene: SKScene {
-  
-  let won: Bool
-  
-  init(size: CGSize, won: Bool) {
-    self.won = won
-    super.init(size: size)
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
-  override func didMoveToView(view: SKView) {
-    let background: SKSpriteNode
+final class GameOverScene: SKScene {
     
-    if won {
-      background = SKSpriteNode(imageNamed: "YouWin")
-    } else {
-      background = SKSpriteNode(imageNamed: "YouLose")
+    let won: Bool
+    
+    init(size: CGSize, won: Bool) {
+        self.won = won
+        super.init(size: size)
     }
     
-    runActionForGameOver()
-    background.position = CGPoint(x: size.width / 2.0, y: size.height / 2.0)
-    addChild(background)
-    
-    let wait = SKAction.waitForDuration(3.0)
-    let block = SKAction.runBlock { [unowned self] in
-      let myScene = GameScene(size: self.size)
-      myScene.scaleMode = self.scaleMode
-      let reveal = SKTransition.flipHorizontalWithDuration(0.5)
-      self.view?.presentScene(myScene, transition: reveal)
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-    runAction(SKAction.sequence([wait, block]))
-  }
-  
-  func runActionForGameOver() {
-    let soundFileName = won ? "win.wav" : "lose.wav"
-    
-    runAction(SKAction.sequence([SKAction.waitForDuration(0.1), SKAction.playSoundFileNamed(soundFileName, waitForCompletion: false)]))
-  }
-  
+    override func didMove(to view: SKView) {
+        let background: SKSpriteNode
+        let soundName: Strings
+        
+        if won {
+            background = SKSpriteNode(imageNamed: Strings.youWin)
+            soundName = Strings.winSound
+        } else {
+            background = SKSpriteNode(imageNamed: Strings.youLose)
+            soundName = Strings.loseSound
+        }
+        
+        background.position = CGPoint(x: size.halfWidth, y: size.halfHeight)
+        addChild(background)
+        
+        run(SKAction.playSoundFileNamed(soundName, waitForCompletion: false))
+        
+        let wait = SKAction.wait(forDuration: 3.0)
+        
+        let block = SKAction.run { [weak self] in
+            guard let `self` = self else { return }
+            let gameScene = GameScene(size: self.size)
+            gameScene.scaleMode = self.scaleMode
+            let reveal = SKTransition.flipHorizontal(withDuration: gameScene.flipHorizontalTransitionDuration)
+            self.view?.presentScene(gameScene, transition: reveal)
+        }
+        
+        run(SKAction.sequence([wait, block]))
+    }
 }
